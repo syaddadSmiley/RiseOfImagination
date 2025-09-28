@@ -195,7 +195,7 @@ strong {
 }
 
 .delayed-reveal {
-    transition-delay: 0.5s;
+    transition-delay: 3s;
 }
 
 .reveal.visible {
@@ -246,14 +246,54 @@ strong {
 }
 
 /* Logika untuk menampilkan/menyembunyikan ikon */
+#music-toggle .icon-unmuted {
+    display: none; /* Sembunyikan ikon 'menyala' secara default */
+}
 #music-toggle .icon-muted {
-    display: none; /* Sembunyikan ikon mute secara default */
+    display: block; /* Tampilkan ikon 'bisu' secara default */
 }
 
+/* State Saat Musik Berputar (.playing ditambahkan oleh JS) */
 #music-toggle.playing .icon-unmuted {
-    display: none; /* Sembunyikan ikon play saat musik berputar */
+    display: block; /* Tampilkan ikon 'menyala' */
+}
+#music-toggle.playing .icon-muted {
+    display: none; /* Sembunyikan ikon 'bisu' */
 }
 
-#music-toggle.playing .icon-muted {
-    display: block; /* Tampilkan ikon mute saat musik berputar */
+.cta-button {
+    display: inline-flex; /* Menggunakan flexbox untuk alignment */
+    align-items: center;
+    gap: 12px; /* Jarak antara teks dan ikon */
+    background: var(--accent-color);
+    border: none;
+    border-radius: 10px; /* Sedikit lebih bulat */
+    padding: 1rem 2rem;
+    margin-top: 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Transisi untuk semua properti */
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2); /* Bayangan awal */
+}
+
+.cta-button .arrow-icon {
+    transition: transform 0.3s ease; /* Transisi khusus untuk ikon */
+}
+
+.cta-button:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-3px); /* Tombol sedikit terangkat */
+    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4); /* Efek cahaya (glow) lebih kuat */
+}
+
+.cta-button:hover .arrow-icon {
+    transform: translateX(5px); /* Ikon bergeser ke kanan */
+}
+
+.cta-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
 }

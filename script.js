@@ -1,22 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- Konfigurasi dan Inisialisasi Particles.js ---
-
-    // Konfigurasi 1: Partikel Tersebar (tanpa garis)
     const configScattered = {
         "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#555555" }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": false }, "move": { "enable": true, "speed": 1, "direction": "none", "out_mode": "out" } },
         "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "resize": true }, "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 0.5 } } } },
         "retina_detect": true
     };
 
-    // Konfigurasi 2: Partikel Terhubung (dengan garis)
     const configConnected = {
         "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#555555" }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.1, "width": 1 }, "move": { "enable": true, "speed": 1, "direction": "none", "out_mode": "out" } },
         "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false }, "resize": true } },
         "retina_detect": true
     };
 
-    // Inisialisasi kedua kanvas
     particlesJS('particles-scattered', configScattered);
     particlesJS('particles-connected', configConnected);
 
@@ -50,35 +46,83 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(element);
     });
 
+    
     // --- Logika Form ---
+    // (Kode ini sudah benar, hanya perlu memastikan tidak ada duplikat)
     const form = document.getElementById('collective-form');
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const button = form.querySelector('button');
-        button.textContent = 'Terima Kasih, Suara Anda Tercatat!';
-        button.style.backgroundColor = '#28a745';
-        button.style.cursor = 'default';
-        
-        form.querySelectorAll('input').forEach(input => {
-            input.disabled = true;
-            input.style.backgroundColor = "#222";
+    if (form) { // Pemeriksaan tambahan untuk memastikan form ada
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            // Logika ini hanya relevan jika Anda menggunakan form HTML, bukan link Google Form
         });
-    });
+    }
+    
 
+    // --- LOGIKA MUSIK YANG ROBUST ---
     const music = document.getElementById('background-music');
     const musicToggle = document.getElementById('music-toggle');
+    const TARGET_VOLUME = 0.3;
     let isMusicPlaying = false;
-    music.volume = 0.3; // Atur volume awal (misal: 30%)
+    let fadeInterval;
 
-    musicToggle.addEventListener('click', () => {
-        if (isMusicPlaying) {
-            music.pause();
-            musicToggle.classList.remove('playing');
-        } else {
-            music.play();
-            musicToggle.classList.add('playing');
-        }
+    const fadeIn = () => {
+        clearInterval(fadeInterval);
+        music.volume = 0;
+        music.play();
+        let currentVolume = 0;
+        fadeInterval = setInterval(() => {
+            if (currentVolume < TARGET_VOLUME - 0.01) {
+                currentVolume += 0.01;
+                music.volume = currentVolume;
+            } else {
+                music.volume = TARGET_VOLUME;
+                clearInterval(fadeInterval);
+            }
+        }, 50);
+    };
+
+    const fadeOut = () => {
+        clearInterval(fadeInterval);
+        let currentVolume = music.volume;
+        fadeInterval = setInterval(() => {
+            if (currentVolume > 0.01) {
+                currentVolume -= 0.01;
+                music.volume = currentVolume;
+            } else {
+                music.pause();
+                music.volume = 0;
+                clearInterval(fadeInterval);
+            }
+        }, 50);
+    };
+
+    const toggleMusic = () => {
         isMusicPlaying = !isMusicPlaying;
-    });
+        if (isMusicPlaying) {
+            fadeIn();
+            musicToggle.classList.add('playing');
+        } else {
+            fadeOut();
+            musicToggle.classList.remove('playing');
+        }
+    };
+    
+    const tryAutoplay = async () => {
+        try {
+            await music.play();
+            isMusicPlaying = true;
+            musicToggle.classList.add('playing');
+            console.log('AAmbasig');
+            fadeIn();
+        } catch (error) {
+            console.log('Autoplay diblokir oleh browser. Menunggu interaksi pengguna.');
+            isMusicPlaying = false;
+            musicToggle.classList.remove('playing');
+        }
+    };
+
+    musicToggle.addEventListener('click', toggleMusic);
+    
+    tryAutoplay();
 
 });
